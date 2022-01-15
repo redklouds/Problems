@@ -1,0 +1,65 @@
+Google gotcha of the traditional Product of self but with a twist O(n) with NO Division
+
+https://dev.to/akhilpokle/product-of-array-except-self-a-mind-boggling-google-interview-question-1en1
+
+
+Product of array except self, a mind-boggling Google Interview question
+#javascript #computerscience #webdev #career
+
+Akhil
+May 14, 2020 ・2 min read
+Question: Given an array nums of n integers where n > 1, return an array output such that output[i] is equal to the product of all the elements of nums except nums[i].
+
+Eg :
+   Input:  [1,2,3,4]
+   Output: [24,12,8,6]
+Seems pretty easy right? Just multiply all the numbers then divide each one to get the result.
+
+Here's the Google twist
+Solve it without division and in O(n) time.
+
+At first I was bit intermediate and I spent a lot of time figeuring it out but the solution is straight forward.
+
+Tip: Always remember this principle
+
+KEEP IT SIMPLE STUPID
+End result is, for an index i we want product of all elements from 0 to i-1 and i+1 to n
+
+So let's divide our problem into two sub-problems:
+
+1> Find the product of all elements less than the current element.
+2> Find the product of all elements greater than the current element.
+
+The product of these two subproblems will give us the final result.
+
+So for all elements less than i, let's keep it in array called left[];
+ left[]=      1      1*arr[0]   1*arr[0]*arr[1]     1*arr[0]*arr[1]*arr[2]
+            arr[0]     arr[1]        arr[2]                  arr[3]
+converting it to code:
+   let left = [];
+   let mul = 1;                 //keeping track of multiplication
+   for(let i=0;i<nums.length;i++){
+       left[i] = mul;
+       mul = mul*nums[i];
+   }
+Similarly for elements more than the current element. let's call it right[]
+ right[]= 1*arr[1]*arr[2]*arr[3]   1*arr[2]*arr[3]       1*arr[3]       1
+              arr[0]                  arr[1]              arr[2]      arr[3]     
+Converting that to code :
+   let right = [];
+   let mul = 1;                 //keeping track of multiplication
+   for(let i=nums.length-1;i>=0;i++){
+       right[i] = mul;
+       mul = mul*nums[i];
+   }
+After this, the only step is to put the two arrays together.
+   let res = [];
+   for(let i=0;i<nums.length;i++){
+       res[i] = left[i]*right[i];
+   }
+   return res;
+Now, let's optimize this, here we're using 3 arrays in total, one for all elements less than i, one for all elements greater than i, and one for the final result.
+
+Let's trim some fat and reduce this to a single array.
+
+We have iterate twice on the array, one from left to right to get the multiplication of all elements less than the current index and once from right to left to get multiplication of all elements greater than the current index one.

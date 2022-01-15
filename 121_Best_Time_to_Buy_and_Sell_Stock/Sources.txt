@@ -1,0 +1,9 @@
+https://www.youtube.com/watch?v=mj7N8pLCJ6w
+
+https://leetcode.com/problems/best-time-to-buy-and-sell-stock-ii/discuss/374303/Go-golang-2-solutions
+
+
+
+for MaxProfit II
+
+https://www.dotnetforall.com/max-profit-with-k-transaction-solution-easy-explanation/
