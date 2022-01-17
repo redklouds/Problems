@@ -24,3 +24,12 @@ func TestMain(t *testing.T) {
 	}
 
 }
+
+func TestMain2(t *testing.T) {
+	s := "dvdf"
+
+	expected := 3
+	if actual := lengthOfLongestSubstring(s); actual != expected {
+		t.Error()
+	}
+}
