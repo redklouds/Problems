@@ -3,6 +3,27 @@ package main
 import "math"
 
 func jump(nums []int) int {
+	//o(n) solution, in which you must think in terms of throwing a rock,
+	//you throw a rock as far as the current index allows, it, and see if you can reach the end,
+	//you know that the first partition, if you cannot find a farther reach will be the first partion, and in this case
+	//the farthestJumpEndIdx will be reached therefore meaning that in the first partion you couln't find a farther jump to the ned
+	//so now you will need to pick up the rock and throw it again, doing the same process
+	farthestJumpIdx := 0
+	partitionJumpEndIdx := 0
+	numJumps := 0
+	for i := 0; i < len(nums)-1; i++ {
+
+		farthestJumpIdx = Max(farthestJumpIdx, i+nums[i])
+		if i == partitionJumpEndIdx {
+			numJumps++
+			partitionJumpEndIdx = farthestJumpIdx
+		}
+	}
+	return numJumps
+}
+
+//this takes extra space
+func jump_DP(nums []int) int {
 
 	if len(nums) == 2 {
 		return 1
