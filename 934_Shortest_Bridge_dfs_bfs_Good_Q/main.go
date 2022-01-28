@@ -1,103 +1,78 @@
 package main
 
-import "math"
-
-type Coords struct {
-	Row int
-	Col int
-}
-
-var directions = [][]int{
-	//ROW, COL UP/DOWN, LEFT/Right
-	{0, -1}, //LEFT
-	{-1, 0}, //UP
-	{0, 1},  //RIGHT
-	{1, 0},  //DOWN
-}
+//O(m*n) solution, where we use DFS and BFS
+//we NEED TO THINK about this
+//think about it.,. if we want to find the shortest distance.. that immediately is BFS.. however we need to find which EDGE is the shortest... the way we can actually do
+//this is not to record the edges themselves... but to
 
 func shortestBridge(grid [][]int) int {
-	//the idea is to
+	// 1 use DS to mark the first island, and enqueue it, we also change island 1 as
+	// and mark as 2 to mark as visited node,
 
-	//2 soltuions 1: get ALLL COOORDINATES of the two island, then run a manhattan dsitance tog et teh SMALLEST distance between the two island, this will answer the question, "how many fips are required to connect to the two"
-
-	//answering that this is the smallest number of distant cells between the two
-
-	//brute force, O(N^2) becasue you will to break the problem into a couple steps
-
-	//1: find and get a list of all coords of the first island
-
-	//2: find and get a list of all the coords of the second island
-
-	//3: apply a distance formula (manhattan distance) since we know it is only four direction
-
-	//4: return the smallest distance
-
-	//all coordinates of island1
 	var island1Coords []*Coords
 
-	var island2Coords []*Coords
+	firstOne := firstIslandCoord(grid)
+	dfs(firstOne.Row, firstOne.Col, &island1Coords, grid)
 
-	island1Done, island2Done := false, false
+	//2 preform BFS on the visited nodes, level by level, and expand by 1 step each level, KNOWNING
+	//that BFS will search around the island 'level by level'
+
+	distance := 0
+	for len(island1Coords) > 0 {
+		//perform level by level traversal known as bounday traversal in Matrix
+		qLen := len(island1Coords)
+		for i := 0; i < qLen; i++ {
+
+			coord := island1Coords[i]
+
+			//if we see a 1/other island return the distance
+			for _, dir := range directions {
+				adjRow := coord.Row + dir[0]
+				adjCol := coord.Col + dir[1]
+				if adjRow >= 0 && adjRow < len(grid) && adjCol >= 0 && adjCol < len(grid[0]) && grid[adjRow][adjCol] != 2 {
+					if grid[adjRow][adjCol] == 1 {
+						return distance
+					}
+					grid[adjRow][adjCol] = 2
+					island1Coords = append(island1Coords, &Coords{adjRow, adjCol})
+				}
+			}
+		}
+		//after each level, we know we have completed a step or walked a aroudn teh boundary
+		distance++
+
+	}
+
+	//if we find the second island return the steps/level immediately
+	return distance
+}
+
+func firstIslandCoord(grid [][]int) Coords {
 	for row := range grid {
 		for col := range grid[0] {
-			if grid[row][col] == 1 && !island1Done {
-				//we found some island lets get all coords
-				//we know that after we run this function all the rest of the cells will be zero, so we can continue where we left off
-				getCoordsIfIslandDfs(row, col, grid, &island1Coords)
-				island1Done = true
-			}
-			//after we finish lets continue to island2 - Optimize we can actually move it forward if we want to the last coords, however we it won't change the run time
-			if grid[row][col] == 1 && !island2Done {
-				getCoordsIfIslandDfs(row, col, grid, &island2Coords)
-				island2Done = true
+			if grid[row][col] == 1 {
+				return Coords{row, col}
 			}
 		}
 	}
-
-	//we have the coords for the two island and all their coords, let run the
-	//distance fornumula for each pair of coords to find the smallest distances
-
-	minDistance := math.MaxInt32
-	for _, coord1 := range island1Coords {
-		for _, coord2 := range island2Coords {
-			minDistance = Min(minDistance, distance(*coord1, *coord2))
-		}
-	}
-	return minDistance
+	return Coords{}
 }
 
-func Min(a, b int) int {
-	if a < b {
-		return a
-	}
-	return b
-}
+//mark and querue in the first island
+func dfs(row int, col int, island1Coords *[]*Coords, grid [][]int) {
 
-//if i may modify the grid i can use it as a visited grid and not need to allocate a visited map
-func getCoordsIfIslandDfs(row int, col int, grid [][]int, islandCoords *[]*Coords) {
-	if row < 0 || row > len(grid)-1 || col < 0 || col > len(grid[0])-1 || grid[row][col] == 0 {
+	if row < 0 || row > len(grid)-1 || col < 0 || col > len(grid[0])-1 || grid[row][col] == 2 || grid[row][col] == 0 {
+		//oob
 		return
 	}
-	//else we are in bounday and the current cell is a land
-	*islandCoords = append(*islandCoords, &Coords{row, col}) //add the current coords
 
-	//flip this cell as visited
-	grid[row][col] = 0
+	//we are on a one and within bounds
+	//mark as 2, and enqueue to the queue
+	coord := &Coords{row, col}
+
+	*island1Coords = append(*island1Coords, coord)
+	grid[row][col] = 2
 	for _, dir := range directions {
-		getCoordsIfIslandDfs(row+dir[0], col+dir[1], grid, islandCoords)
+		dfs(row+dir[0], col+dir[1], island1Coords, grid)
 	}
-}
-
-//given two coordinates perform the manhattan distance formula
-func distance(coords1, coords2 Coords) int {
-	//dist = Abs(x2 - x1) + Abs(y2 - y1)
-	return (Abs(coords2.Col-coords1.Col) + Abs(coords2.Row-coords1.Row)) - 1
-}
-
-//if val is negative return inverse of it
-func Abs(val int) int {
-	if val < 0 {
-		return -val
-	}
-	return val
 }
