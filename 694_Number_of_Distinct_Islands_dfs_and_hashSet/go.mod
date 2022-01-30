@@ -1,0 +1,3 @@
+module 694_Number_of_Distinct_Islands_dfs_and_hashSet
+
+go 1.16
